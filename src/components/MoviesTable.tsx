@@ -8,9 +8,18 @@ type MoviesTableProps = {
   movieCompanies: MovieCompanies[];
   selectedMovieId: number | null;
   setSelectedMovieId: (id: number | null) => void;
+  setReview: (review: string) => void;
+  setResponseMessage: (message: string | null) => void;
 };
 
-const MoviesTable = ({ movies, movieCompanies, selectedMovieId, setSelectedMovieId }: MoviesTableProps) => {
+const MoviesTable = ({
+  movies,
+  movieCompanies,
+  selectedMovieId,
+  setSelectedMovieId,
+  setReview,
+  setResponseMessage,
+}: MoviesTableProps) => {
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [sortedMovies, setSortedMovies] = useState(movies);
 
@@ -58,6 +67,8 @@ const MoviesTable = ({ movies, movieCompanies, selectedMovieId, setSelectedMovie
               key={`movie-${movie.id}`}
               sx={{ "&:last-child td, &:last-child th": { border: 0 }, cursor: "pointer" }}
               onClick={() => {
+                setReview("");
+                setResponseMessage(null);
                 selectedMovieId === movie.id ? setSelectedMovieId(null) : setSelectedMovieId(movie.id);
               }}
               selected={selectedMovieId === movie.id}

@@ -2,6 +2,7 @@ import { useEffect, useReducer, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import { apiReducer } from "./reducers/apiReducer";
 import { ErrorAlert, Header, MoviesTable, ReviewForm } from "./components";
+import { SubmitResponse } from "./types";
 
 const api_url = import.meta.env.VITE_API_URL;
 
@@ -13,6 +14,8 @@ export const App = () => {
     movieCompanies: [],
   });
   const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
+  const [review, setReview] = useState("");
+  const [responseMessage, setResponseMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -37,6 +40,36 @@ export const App = () => {
     }
   };
 
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (selectedMovieId !== null) {
+      try {
+        const response = await fetch(`${api_url}/submitReview`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            movieId: selectedMovieId,
+            review: review,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data: SubmitResponse = await response.json();
+        console.log(data.message);
+        setResponseMessage(data.message);
+        setReview("");
+        setSelectedMovieId(null);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+
   if (state.error) {
     return <ErrorAlert error={state.error} onRefresh={fetchData} />;
   }
@@ -50,8 +83,17 @@ export const App = () => {
         movieCompanies={state.movieCompanies}
         selectedMovieId={selectedMovieId}
         setSelectedMovieId={setSelectedMovieId}
+        setReview={setReview}
+        setResponseMessage={setResponseMessage}
       />
-      <ReviewForm selectedMovieId={selectedMovieId} movies={state.movies} />
+      <ReviewForm
+        selectedMovieId={selectedMovieId}
+        movies={state.movies}
+        review={review}
+        setReview={setReview}
+        handleSubmit={handleSubmit}
+        responseMessage={responseMessage}
+      />
     </div>
   );
 };

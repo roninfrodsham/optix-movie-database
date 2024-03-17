@@ -2,7 +2,7 @@ import { Alert, Button } from "@mui/material";
 
 type ErrorAlertProps = {
   error: Error;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void>;
 };
 
 const ErrorAlert = ({ error, onRefresh }: ErrorAlertProps) => {

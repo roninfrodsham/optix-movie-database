@@ -3,7 +3,7 @@ import { H1 } from "./StyledComponents";
 
 type HeaderProps = {
   totalMovies: number;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void>;
 };
 
 const Header = ({ totalMovies, onRefresh }: HeaderProps) => {
