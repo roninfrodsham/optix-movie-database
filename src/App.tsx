@@ -3,6 +3,7 @@ import { CircularProgress } from "@mui/material";
 import { apiReducer } from "./reducers/apiReducer";
 import { ErrorAlert } from "./components/ErrorAlert";
 import { Header } from "./components/Header";
+import { MoviesTable } from "./components/MoviesTable";
 
 const api_url = import.meta.env.VITE_API_URL;
 
@@ -46,6 +47,7 @@ export const App = () => {
     <div>
       <Header totalMovies={state.movies.length} onRefresh={fetchData} />
       {state.isLoading && <CircularProgress />}
+      <MoviesTable movies={state.movies} movieCompanies={state.movieCompanies} />
     </div>
   );
 };
