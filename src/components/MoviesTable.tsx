@@ -28,7 +28,7 @@ const MoviesTable = ({ movies, movieCompanies }: MoviesTableProps) => {
 
   return (
     <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
-      <Table>
+      <Table sx={{ minWidth: 600 }}>
         <TableHead>
           <TableRow sx={{ backgroundColor: "#d9f0fa" }}>
             <TableCell sx={{ color: "#005999" }}>Title</TableCell>
