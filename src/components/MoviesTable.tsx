@@ -1,4 +1,6 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Movie, MovieCompanies } from "../types";
 
 type MoviesTableProps = {
@@ -7,6 +9,23 @@ type MoviesTableProps = {
 };
 
 const MoviesTable = ({ movies, movieCompanies }: MoviesTableProps) => {
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [sortedMovies, setSortedMovies] = useState(movies);
+
+  useEffect(() => {
+    setSortedMovies([...movies]);
+  }, [movies]);
+
+  const sortMovies = () => {
+    const sorted = [...sortedMovies].sort((a, b) => {
+      const aAverageReview = a.reviews.reduce((acc, val) => acc + val, 0) / a.reviews.length;
+      const bAverageReview = b.reviews.reduce((acc, val) => acc + val, 0) / b.reviews.length;
+      return sortOrder === "desc" ? bAverageReview - aAverageReview : aAverageReview - bAverageReview;
+    });
+    setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+    setSortedMovies(sorted);
+  };
+
   return (
     <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
       <Table>
@@ -17,12 +36,21 @@ const MoviesTable = ({ movies, movieCompanies }: MoviesTableProps) => {
               sx={{ color: "#005999", display: "flex", alignItems: "center", justifyContent: "space-between" }}
             >
               Reviews
+              <IconButton color='inherit' size='small' onClick={sortMovies}>
+                <ArrowUpwardIcon
+                  fontSize='small'
+                  sx={{
+                    transform: `rotate(${sortOrder === "desc" ? "0deg" : "180deg"})`,
+                    transition: "transform 0.3s ease-in-out",
+                  }}
+                />
+              </IconButton>
             </TableCell>
             <TableCell sx={{ color: "#005999" }}>Film Company</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {movies.map((movie: Movie) => (
+          {sortedMovies.map((movie: Movie) => (
             <TableRow
               hover
               key={`movie-${movie.id}`}
