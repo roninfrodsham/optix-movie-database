@@ -31,8 +31,9 @@ export const App = () => {
       dispatch({ type: "FETCH_SUCCESS", payload: { movies, movieCompanies } });
     } catch (error) {
       if (error instanceof Error) {
-        console.error(error);
         dispatch({ type: "FETCH_FAILURE", payload: error });
+      } else {
+        dispatch({ type: "FETCH_FAILURE", payload: new Error(String(error)) });
       }
     }
   };
