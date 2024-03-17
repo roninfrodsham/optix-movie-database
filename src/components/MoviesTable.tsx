@@ -6,9 +6,11 @@ import { Movie, MovieCompanies } from "../types";
 type MoviesTableProps = {
   movies: Movie[];
   movieCompanies: MovieCompanies[];
+  selectedMovieId: number | null;
+  setSelectedMovieId: (id: number | null) => void;
 };
 
-const MoviesTable = ({ movies, movieCompanies }: MoviesTableProps) => {
+const MoviesTable = ({ movies, movieCompanies, selectedMovieId, setSelectedMovieId }: MoviesTableProps) => {
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [sortedMovies, setSortedMovies] = useState(movies);
 
@@ -55,6 +57,10 @@ const MoviesTable = ({ movies, movieCompanies }: MoviesTableProps) => {
               hover
               key={`movie-${movie.id}`}
               sx={{ "&:last-child td, &:last-child th": { border: 0 }, cursor: "pointer" }}
+              onClick={() => {
+                selectedMovieId === movie.id ? setSelectedMovieId(null) : setSelectedMovieId(movie.id);
+              }}
+              selected={selectedMovieId === movie.id}
             >
               <TableCell component='th' scope='row'>
                 {movie.title}
