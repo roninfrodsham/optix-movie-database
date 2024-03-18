@@ -2,15 +2,15 @@ import { Alert, Button } from "@mui/material";
 
 type ErrorAlertProps = {
   error: Error;
-  onRefresh: () => void;
+  refreshMovies: () => void;
 };
 
-const ErrorAlert = ({ error, onRefresh }: ErrorAlertProps) => {
+const ErrorAlert = ({ error, refreshMovies }: ErrorAlertProps) => {
   return (
     <Alert
       severity='error'
       action={
-        <Button color='inherit' size='small' onClick={onRefresh}>
+        <Button color='inherit' size='small' onClick={refreshMovies}>
           Refresh Movies
         </Button>
       }
