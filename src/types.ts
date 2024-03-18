@@ -33,9 +33,7 @@ export type ApiAction =
 
 export type ReviewAction =
   | { type: ActionTypes.SET_REVIEW; payload: string }
-  | { type: ActionTypes.CLEAR_REVIEW }
   | { type: ActionTypes.SET_SELECTED_MOVIE; payload: number }
-  | { type: ActionTypes.CLEAR_SELECTED_MOVIE }
   | { type: ActionTypes.RESET_REVIEW_STATE };
 
 export type Movie = {
