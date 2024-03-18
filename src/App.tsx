@@ -36,7 +36,7 @@ export const App = () => {
         apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: new Error(String(error)) });
       }
     }
-  };
+  }; // todo: look at extracting this function to a custom hook
 
   useEffect(() => {
     fetchData();
@@ -63,8 +63,7 @@ export const App = () => {
 
         const data: SubmitResponse = await response.json();
         apiDispatch({ type: ActionTypes.SUBMIT_SUCCESS, payload: data.message });
-        reviewDispatch({ type: ActionTypes.CLEAR_REVIEW });
-        reviewDispatch({ type: ActionTypes.CLEAR_SELECTED_MOVIE });
+        reviewDispatch({ type: ActionTypes.RESET_REVIEW_STATE }); // todo: look at combining reducers to remove this side effect
       } catch (error) {
         if (error instanceof Error) {
           apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: error });
@@ -73,11 +72,10 @@ export const App = () => {
         }
       }
     }
-  };
+  }; // todo: look at extracting this function to a custom hook
 
   const refreshMovies = () => {
-    reviewDispatch({ type: ActionTypes.CLEAR_REVIEW });
-    reviewDispatch({ type: ActionTypes.CLEAR_SELECTED_MOVIE });
+    reviewDispatch({ type: ActionTypes.RESET_REVIEW_STATE });
     fetchData();
   };
 

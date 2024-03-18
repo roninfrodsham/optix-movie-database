@@ -21,6 +21,7 @@ export enum ActionTypes {
   CLEAR_SELECTED_MOVIE = "CLEAR_SELECTED_MOVIE",
   SUBMIT_SUCCESS = "SUBMIT_SUCCESS",
   CLEAR_RESPONSE_MESSAGE = "CLEAR_RESPONSE_MESSAGE",
+  RESET_REVIEW_STATE = "RESET_REVIEW_STATE",
 }
 
 export type ApiAction =
@@ -34,7 +35,8 @@ export type ReviewAction =
   | { type: ActionTypes.SET_REVIEW; payload: string }
   | { type: ActionTypes.CLEAR_REVIEW }
   | { type: ActionTypes.SET_SELECTED_MOVIE; payload: number }
-  | { type: ActionTypes.CLEAR_SELECTED_MOVIE };
+  | { type: ActionTypes.CLEAR_SELECTED_MOVIE }
+  | { type: ActionTypes.RESET_REVIEW_STATE };
 
 export type Movie = {
   id: number;

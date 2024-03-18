@@ -60,10 +60,9 @@ const MoviesTable = ({ movies, movieCompanies, selectedMovieId, apiDispatch, rev
               sx={{ "&:last-child td, &:last-child th": { border: 0 }, cursor: "pointer" }}
               onClick={() => {
                 apiDispatch({ type: ActionTypes.CLEAR_RESPONSE_MESSAGE });
-                reviewDispatch({ type: ActionTypes.CLEAR_REVIEW });
-                selectedMovieId === movie.id
-                  ? reviewDispatch({ type: ActionTypes.CLEAR_SELECTED_MOVIE })
-                  : reviewDispatch({ type: ActionTypes.SET_SELECTED_MOVIE, payload: movie.id });
+                reviewDispatch({ type: ActionTypes.RESET_REVIEW_STATE }); // todo: look at combining reducers
+                selectedMovieId !== movie.id &&
+                  reviewDispatch({ type: ActionTypes.SET_SELECTED_MOVIE, payload: movie.id });
               }}
               selected={selectedMovieId === movie.id}
             >

@@ -23,9 +23,11 @@ npm run build
 npm run preview
 ```
 
-### Todo
+### Todos
 
-I have focused on getting the application working as requested and I have four issues remaining in my project:
+I have focused on getting the application working as requested and I have left a few comments in the code of things I want to look at to make the code easier to follow and maintain.
+
+I have four issues remaining in my project:
 
 - Add jest and unit testing
 - Optimisation
