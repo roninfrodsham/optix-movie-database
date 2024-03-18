@@ -1,14 +1,14 @@
-import { State, Action } from "../types";
+import { ApiState, ApiAction, ActionTypes } from "../types";
 
-export const apiReducer = (state: State, action: Action): State => {
+const apiReducer = (state: ApiState, action: ApiAction): ApiState => {
   switch (action.type) {
-    case "FETCH_INIT":
+    case ActionTypes.FETCH_INIT:
       return {
         ...state,
         isLoading: true,
         error: null,
       };
-    case "FETCH_SUCCESS":
+    case ActionTypes.FETCH_SUCCESS:
       return {
         ...state,
         isLoading: false,
@@ -16,13 +16,19 @@ export const apiReducer = (state: State, action: Action): State => {
         movies: action.payload.movies,
         movieCompanies: action.payload.movieCompanies,
       };
-    case "FETCH_FAILURE":
+    case ActionTypes.FETCH_FAILURE:
       return {
         ...state,
         isLoading: false,
         error: action.payload,
       };
+    case ActionTypes.SUBMIT_SUCCESS:
+      return { ...state, responseMessage: action.payload };
+    case ActionTypes.CLEAR_RESPONSE_MESSAGE:
+      return { ...state, responseMessage: null };
     default:
-      throw new Error();
+      return state;
   }
 };
+
+export { apiReducer };

@@ -1,17 +1,24 @@
 import { Button, TextField } from "@mui/material";
 import { H2, FormContainer } from "./StyledComponents";
-import { Movie } from "../types";
+import { Movie, ReviewAction, ActionTypes } from "../types";
 
 type ReviewFormProps = {
   selectedMovieId: number | null;
   movies: Movie[];
   review: string;
-  setReview: (review: string) => void;
+  reviewDispatch: React.Dispatch<ReviewAction>;
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
   responseMessage: string | null;
 };
 
-const ReviewForm = ({ selectedMovieId, movies, review, setReview, handleSubmit, responseMessage }: ReviewFormProps) => {
+const ReviewForm = ({
+  selectedMovieId,
+  movies,
+  review,
+  reviewDispatch,
+  handleSubmit,
+  responseMessage,
+}: ReviewFormProps) => {
   return (
     <>
       <H2>Movie Review</H2>
@@ -28,7 +35,7 @@ const ReviewForm = ({ selectedMovieId, movies, review, setReview, handleSubmit, 
               inputProps={{ maxLength: 100 }}
               sx={{ width: "100%", marginBottom: "1em" }}
               value={review}
-              onChange={(event) => setReview(event.target.value)}
+              onChange={(event) => reviewDispatch({ type: ActionTypes.SET_REVIEW, payload: event.target.value })}
             />
             <Button variant='contained' type='submit'>
               Submit Review

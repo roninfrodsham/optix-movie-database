@@ -3,10 +3,10 @@ import { H1 } from "./StyledComponents";
 
 type HeaderProps = {
   totalMovies: number;
-  onRefresh: () => Promise<void>;
+  refreshMovies: () => void;
 };
 
-const Header = ({ totalMovies, onRefresh }: HeaderProps) => {
+const Header = ({ totalMovies, refreshMovies }: HeaderProps) => {
   return (
     <>
       <H1>Welcome to Movie database!</H1>
@@ -14,7 +14,7 @@ const Header = ({ totalMovies, onRefresh }: HeaderProps) => {
         <Alert
           severity='info'
           action={
-            <Button color='inherit' size='small' onClick={onRefresh}>
+            <Button color='inherit' size='small' onClick={refreshMovies}>
               Refresh Movies
             </Button>
           }

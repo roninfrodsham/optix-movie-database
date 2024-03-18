@@ -1,28 +1,26 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { CircularProgress } from "@mui/material";
-import { apiReducer } from "./reducers/apiReducer";
+import { apiReducer, reviewReducer } from "./reducers";
 import { ErrorAlert, Header, MoviesTable, ReviewForm } from "./components";
-import { SubmitResponse } from "./types";
+import { SubmitResponse, ActionTypes } from "./types";
 
 const api_url = import.meta.env.VITE_API_URL;
 
 export const App = () => {
-  const [state, dispatch] = useReducer(apiReducer, {
+  const [apiState, apiDispatch] = useReducer(apiReducer, {
     isLoading: false,
     error: null,
     movies: [],
     movieCompanies: [],
+    responseMessage: null,
   });
-  const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null);
-  const [review, setReview] = useState("");
-  const [responseMessage, setResponseMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchData();
-  }, []); // fetchData is not a dependency as it doesn't use any values from the component scope
+  const [reviewState, reviewDispatch] = useReducer(reviewReducer, {
+    review: "",
+    selectedMovieId: null,
+  });
 
   const fetchData = async () => {
-    dispatch({ type: "FETCH_INIT" });
+    apiDispatch({ type: ActionTypes.FETCH_INIT });
 
     try {
       const [movies, movieCompanies] = await Promise.all([
@@ -30,19 +28,23 @@ export const App = () => {
         fetch(`${api_url}/movieCompanies`).then((res) => res.json()),
       ]);
 
-      dispatch({ type: "FETCH_SUCCESS", payload: { movies, movieCompanies } });
+      apiDispatch({ type: ActionTypes.FETCH_SUCCESS, payload: { movies, movieCompanies } });
     } catch (error) {
       if (error instanceof Error) {
-        dispatch({ type: "FETCH_FAILURE", payload: error });
+        apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: error });
       } else {
-        dispatch({ type: "FETCH_FAILURE", payload: new Error(String(error)) });
+        apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: new Error(String(error)) });
       }
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []); // fetchData is not a dependency as it doesn't use any values from the component scope
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (selectedMovieId !== null) {
+    if (reviewState.selectedMovieId !== null) {
       try {
         const response = await fetch(`${api_url}/submitReview`, {
           method: "POST",
@@ -50,8 +52,8 @@ export const App = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            movieId: selectedMovieId,
-            review: review,
+            movieId: reviewState.selectedMovieId,
+            review: reviewState.review,
           }),
         });
 
@@ -60,39 +62,47 @@ export const App = () => {
         }
 
         const data: SubmitResponse = await response.json();
-        console.log(data.message);
-        setResponseMessage(data.message);
-        setReview("");
-        setSelectedMovieId(null);
+        apiDispatch({ type: ActionTypes.SUBMIT_SUCCESS, payload: data.message });
+        reviewDispatch({ type: ActionTypes.CLEAR_REVIEW });
+        reviewDispatch({ type: ActionTypes.CLEAR_SELECTED_MOVIE });
       } catch (error) {
-        console.error("Error:", error);
+        if (error instanceof Error) {
+          apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: error });
+        } else {
+          apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: new Error(String(error)) });
+        }
       }
     }
   };
 
-  if (state.error) {
-    return <ErrorAlert error={state.error} onRefresh={fetchData} />;
+  const refreshMovies = () => {
+    reviewDispatch({ type: ActionTypes.CLEAR_REVIEW });
+    reviewDispatch({ type: ActionTypes.CLEAR_SELECTED_MOVIE });
+    fetchData();
+  };
+
+  if (apiState.error) {
+    return <ErrorAlert error={apiState.error} refreshMovies={refreshMovies} />;
   }
 
   return (
     <div>
-      <Header totalMovies={state.movies.length} onRefresh={fetchData} />
-      {state.isLoading && <CircularProgress />}
+      <Header totalMovies={apiState.movies.length} refreshMovies={refreshMovies} />
+      {apiState.isLoading && <CircularProgress />}
       <MoviesTable
-        movies={state.movies}
-        movieCompanies={state.movieCompanies}
-        selectedMovieId={selectedMovieId}
-        setSelectedMovieId={setSelectedMovieId}
-        setReview={setReview}
-        setResponseMessage={setResponseMessage}
+        movies={apiState.movies}
+        movieCompanies={apiState.movieCompanies}
+        selectedMovieId={reviewState.selectedMovieId}
+        apiDispatch={apiDispatch}
+        reviewDispatch={reviewDispatch}
       />
       <ReviewForm
-        selectedMovieId={selectedMovieId}
-        movies={state.movies}
-        review={review}
-        setReview={setReview}
+        selectedMovieId={reviewState.selectedMovieId}
+        movies={apiState.movies}
+        review={reviewState.review}
+        reviewDispatch={reviewDispatch}
         handleSubmit={handleSubmit}
-        responseMessage={responseMessage}
+        responseMessage={apiState.responseMessage}
       />
     </div>
   );

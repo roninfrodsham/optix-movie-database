@@ -1,25 +1,17 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { Movie, MovieCompanies } from "../types";
+import { Movie, MovieCompanies, ApiAction, ReviewAction, ActionTypes } from "../types";
 
 type MoviesTableProps = {
   movies: Movie[];
   movieCompanies: MovieCompanies[];
   selectedMovieId: number | null;
-  setSelectedMovieId: (id: number | null) => void;
-  setReview: (review: string) => void;
-  setResponseMessage: (message: string | null) => void;
+  apiDispatch: React.Dispatch<ApiAction>;
+  reviewDispatch: React.Dispatch<ReviewAction>;
 };
 
-const MoviesTable = ({
-  movies,
-  movieCompanies,
-  selectedMovieId,
-  setSelectedMovieId,
-  setReview,
-  setResponseMessage,
-}: MoviesTableProps) => {
+const MoviesTable = ({ movies, movieCompanies, selectedMovieId, apiDispatch, reviewDispatch }: MoviesTableProps) => {
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [sortedMovies, setSortedMovies] = useState(movies);
 
@@ -67,9 +59,11 @@ const MoviesTable = ({
               key={`movie-${movie.id}`}
               sx={{ "&:last-child td, &:last-child th": { border: 0 }, cursor: "pointer" }}
               onClick={() => {
-                setReview("");
-                setResponseMessage(null);
-                selectedMovieId === movie.id ? setSelectedMovieId(null) : setSelectedMovieId(movie.id);
+                apiDispatch({ type: ActionTypes.CLEAR_RESPONSE_MESSAGE });
+                reviewDispatch({ type: ActionTypes.CLEAR_REVIEW });
+                selectedMovieId === movie.id
+                  ? reviewDispatch({ type: ActionTypes.CLEAR_SELECTED_MOVIE })
+                  : reviewDispatch({ type: ActionTypes.SET_SELECTED_MOVIE, payload: movie.id });
               }}
               selected={selectedMovieId === movie.id}
             >
