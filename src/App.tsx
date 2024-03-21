@@ -1,107 +1,50 @@
 import { useEffect, useReducer } from "react";
 import { CircularProgress } from "@mui/material";
-import { apiReducer, reviewReducer } from "./reducers";
+import { appReducer } from "./reducers";
+import { useFetchData, useSubmitReview } from "./hooks";
 import { ErrorAlert, Header, MoviesTable, ReviewForm } from "./components";
-import { SubmitResponse, ActionTypes } from "./types";
+import { AppState } from "./types";
 
 const api_url = import.meta.env.VITE_API_URL;
+const initialState: AppState = {
+  isLoading: false,
+  error: null,
+  movies: [],
+  movieCompanies: [],
+  responseMessage: null,
+  selectedMovieId: null,
+};
 
 export const App = () => {
-  const [apiState, apiDispatch] = useReducer(apiReducer, {
-    isLoading: false,
-    error: null,
-    movies: [],
-    movieCompanies: [],
-    responseMessage: null,
-  });
-  const [reviewState, reviewDispatch] = useReducer(reviewReducer, {
-    review: "",
-    selectedMovieId: null,
-  });
+  const [appState, appDispatch] = useReducer(appReducer, initialState);
 
-  const fetchData = async () => {
-    apiDispatch({ type: ActionTypes.FETCH_INIT });
-
-    try {
-      const [movies, movieCompanies] = await Promise.all([
-        fetch(`${api_url}/movies`).then((res) => res.json()),
-        fetch(`${api_url}/movieCompanies`).then((res) => res.json()),
-      ]);
-
-      apiDispatch({ type: ActionTypes.FETCH_SUCCESS, payload: { movies, movieCompanies } });
-    } catch (error) {
-      if (error instanceof Error) {
-        apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: error });
-      } else {
-        apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: new Error(String(error)) });
-      }
-    }
-  }; // todo: look at extracting this function to a custom hook
+  const { fetchData, refreshMovies } = useFetchData(appDispatch, api_url);
+  const handleSubmit = useSubmitReview(appState, appDispatch, api_url);
 
   useEffect(() => {
     fetchData();
-  }, []); // fetchData is not a dependency as it doesn't use any values from the component scope
+  }, [fetchData]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (reviewState.selectedMovieId !== null) {
-      try {
-        const response = await fetch(`${api_url}/submitReview`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            movieId: reviewState.selectedMovieId,
-            review: reviewState.review,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: SubmitResponse = await response.json();
-        apiDispatch({ type: ActionTypes.SUBMIT_SUCCESS, payload: data.message });
-        reviewDispatch({ type: ActionTypes.RESET_REVIEW_STATE }); // todo: look at combining reducers to remove this side effect
-      } catch (error) {
-        if (error instanceof Error) {
-          apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: error });
-        } else {
-          apiDispatch({ type: ActionTypes.FETCH_FAILURE, payload: new Error(String(error)) });
-        }
-      }
-    }
-  }; // todo: look at extracting this function to a custom hook
-
-  const refreshMovies = () => {
-    reviewDispatch({ type: ActionTypes.RESET_REVIEW_STATE });
-    fetchData();
-  };
-
-  if (apiState.error) {
-    return <ErrorAlert error={apiState.error} refreshMovies={refreshMovies} />;
+  if (appState.error) {
+    return <ErrorAlert error={appState.error} refreshMovies={refreshMovies} />;
   }
 
   return (
-    <div>
-      <Header totalMovies={apiState.movies.length} refreshMovies={refreshMovies} />
-      {apiState.isLoading && <CircularProgress />}
+    <>
+      <Header totalMovies={appState.movies.length} refreshMovies={refreshMovies} />
+      {appState.isLoading && <CircularProgress />}
       <MoviesTable
-        movies={apiState.movies}
-        movieCompanies={apiState.movieCompanies}
-        selectedMovieId={reviewState.selectedMovieId}
-        apiDispatch={apiDispatch}
-        reviewDispatch={reviewDispatch}
+        movies={appState.movies}
+        movieCompanies={appState.movieCompanies}
+        selectedMovieId={appState.selectedMovieId}
+        appDispatch={appDispatch}
       />
       <ReviewForm
-        selectedMovieId={reviewState.selectedMovieId}
-        movies={apiState.movies}
-        review={reviewState.review}
-        reviewDispatch={reviewDispatch}
+        selectedMovieId={appState.selectedMovieId}
+        movies={appState.movies}
         handleSubmit={handleSubmit}
-        responseMessage={apiState.responseMessage}
+        responseMessage={appState.responseMessage}
       />
-    </div>
+    </>
   );
 };

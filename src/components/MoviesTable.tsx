@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import { Movie, MovieCompanies, ApiAction, ReviewAction, ActionTypes } from "../types";
+import { Movie, MovieCompanies, AppAction, ActionTypes } from "../types";
 
 type MoviesTableProps = {
   movies: Movie[];
   movieCompanies: MovieCompanies[];
   selectedMovieId: number | null;
-  apiDispatch: React.Dispatch<ApiAction>;
-  reviewDispatch: React.Dispatch<ReviewAction>;
+  appDispatch: React.Dispatch<AppAction>;
 };
 
-const MoviesTable = ({ movies, movieCompanies, selectedMovieId, apiDispatch, reviewDispatch }: MoviesTableProps) => {
+const MoviesTable = ({ movies, movieCompanies, selectedMovieId, appDispatch }: MoviesTableProps) => {
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [sortedMovies, setSortedMovies] = useState(movies);
 
@@ -59,10 +58,9 @@ const MoviesTable = ({ movies, movieCompanies, selectedMovieId, apiDispatch, rev
               key={`movie-${movie.id}`}
               sx={{ "&:last-child td, &:last-child th": { border: 0 }, cursor: "pointer" }}
               onClick={() => {
-                apiDispatch({ type: ActionTypes.CLEAR_RESPONSE_MESSAGE });
-                reviewDispatch({ type: ActionTypes.RESET_REVIEW_STATE }); // todo: look at combining reducers
+                appDispatch({ type: ActionTypes.RESET_REVIEW_STATE });
                 selectedMovieId !== movie.id &&
-                  reviewDispatch({ type: ActionTypes.SET_SELECTED_MOVIE, payload: movie.id });
+                  appDispatch({ type: ActionTypes.SET_SELECTED_MOVIE, payload: movie.id });
               }}
               selected={selectedMovieId === movie.id}
             >
