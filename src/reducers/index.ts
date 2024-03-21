@@ -1,2 +1,1 @@
-export { apiReducer } from "./apiReducer";
-export { reviewReducer } from "./reviewReducer";
+export { appReducer } from "./appReducer";
