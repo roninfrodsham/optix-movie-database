@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Movie, MovieCompanies, AppAction, ActionTypes } from "../types";
@@ -21,9 +21,9 @@ const MoviesTable = ({ movies, movieCompanies, selectedMovieId, appDispatch }: M
     });
   }, [movies, sortOrder]);
 
-  const sortMovies = () => {
+  const sortMovies = useCallback(() => {
     setSortOrder(sortOrder === "desc" ? "asc" : "desc");
-  };
+  }, [sortOrder]);
 
   return (
     <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
