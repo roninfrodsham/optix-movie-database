@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { Movie, MovieCompanies, AppAction, ActionTypes } from "../types";
@@ -12,20 +12,17 @@ type MoviesTableProps = {
 
 const MoviesTable = ({ movies, movieCompanies, selectedMovieId, appDispatch }: MoviesTableProps) => {
   const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
-  const [sortedMovies, setSortedMovies] = useState(movies);
 
-  useEffect(() => {
-    setSortedMovies([...movies]);
-  }, [movies]);
-
-  const sortMovies = () => {
-    const sorted = [...sortedMovies].sort((a, b) => {
+  const sortedMovies = useMemo(() => {
+    return [...movies].sort((a, b) => {
       const aAverageReview = a.reviews.reduce((acc, val) => acc + val, 0) / a.reviews.length;
       const bAverageReview = b.reviews.reduce((acc, val) => acc + val, 0) / b.reviews.length;
       return sortOrder === "desc" ? bAverageReview - aAverageReview : aAverageReview - bAverageReview;
     });
+  }, [movies, sortOrder]);
+
+  const sortMovies = () => {
     setSortOrder(sortOrder === "desc" ? "asc" : "desc");
-    setSortedMovies(sorted);
   };
 
   return (
